@@ -182,7 +182,7 @@ function update() {
 
 
 // Set camera field of view
-const fov = 35; // Example value
+const fov = 60; // Example value
 camera.fov = fov;
 camera.updateProjectionMatrix();
 
