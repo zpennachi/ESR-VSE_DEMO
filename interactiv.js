@@ -5,32 +5,23 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById('myContainer').appendChild(renderer.domElement);
 let isAudioPlaying = false; // Global variable to track audio playback state
+
 // Add an audio listener to the camera
 const listener = new THREE.AudioListener();
 camera.add(listener);
 
-// Get the play/pause button element
-const playPauseButton = document.getElementById('playPauseButton');
-
-// Play/pause button event listener
-playPauseButton.addEventListener('click', togglePlayPause);
 
 const audioUrls = [
-  
-    'hhttps://dl.dropboxusercontent.com/scl/fi/1z3svxo35cibx41o7aqo4/Obj_4.wav?rlkey=gjvzblj98te5poofg0g5p1l3c&st=ks08aca6&dl=1',
-  
+    'https://dl.dropboxusercontent.com/scl/fi/1z3svxo35cibx41o7aqo4/Obj_4.wav?rlkey=gjvzblj98te5poofg0g5p1l3c&st=ks08aca6&dl=1',
     'https://dl.dropboxusercontent.com/scl/fi/87oonsmphqwjdxrtuehlg/Obj_3.wav?rlkey=wnmhjl4ex6fgnv4fth3cw93av&st=vlk6haqc&dl=1',
-  
     'https://dl.dropboxusercontent.com/scl/fi/ryuw8v9r9hdqns5nkvxlg/Obj_2.wav?rlkey=e63n5f44f8q18wks1b1g3wc3e&st=is889qj9&dl=1',
-  
     'https://dl.dropboxusercontent.com/scl/fi/b10yqo42r8biq6h0jtzge/Obj_1.wav?rlkey=csonvb9b19yp2zp4lx6elpum9&st=8ee4pnvr&dl=1'
-  
 ];
 const audioPositions = [
-    new THREE.Vector3(2, 0, 8),
-    new THREE.Vector3(-1, 0, 1),
-    new THREE.Vector3(1, 0, -1),
-    new THREE.Vector3(-1, 0, -1)
+    new THREE.Vector3(2, 0, -8),
+    new THREE.Vector3(-1, 0, 8),
+    new THREE.Vector3(1, 0, 8),
+    new THREE.Vector3(-1, 0, 8)
 ];
 const audioLoader = new THREE.AudioLoader();
 const audioSources = [];
@@ -41,7 +32,6 @@ audioUrls.forEach((url, index) => {
         const audio = new THREE.PositionalAudio(listener);
         audio.setBuffer(buffer);
         audio.setRefDistance(1);
-        audioSpheres[index].add(audio); // This line suggests you're adding audio to audioSpheres, not audioSources
         audio.play(); // Play the audio once it's loaded
         audioSources.push(audio); // Add the loaded audio to the audioSources array
     }, undefined, (err) => {
@@ -59,23 +49,21 @@ controls.maxPolarAngle = Math.PI / 2;
 controls.enabled = false;
 
 // Set the desired x, y, z coordinates for the orbit point
-const targetX = 0; 
-const targetY = 2; 
-const targetZ = 10; 
+const targetX = 0;
+const targetY = 2;
+const targetZ = 10;
 
 // Set the target coordinates for the OrbitControls
 controls.target.set(targetX, targetY, targetZ);
 
 // Set the camera position based on your preferred values
-const cameraX = 0; 
-const cameraY = 0; 
-const cameraZ = 10; 
+const cameraX = 0;
+const cameraY = 0;
+const cameraZ = 10;
 
 // Set the camera position
 camera.position.set(cameraX, cameraY, cameraZ);
 setCameraPosition(1); // Set initial camera position to follow button 1
-
-
 
 // Load the court model
 const loader = new THREE.GLTFLoader();
@@ -159,24 +147,24 @@ function setCameraPosition(position) {
     const duration = 2000; // Transition duration in milliseconds
     let currentTime = 0;
 
-  function easeInOutQuad(t) {
-    return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-}
-  
-function update() {
-    currentTime += 16; // Assuming 60fps, 1000ms/60fps ≈ 16ms
-
-    if (currentTime >= duration) {
-        camera.position.copy(targetPosition); // Ensure the camera reaches the exact target position
-        controls.enabled = false; // Disable camera controls after changing position
-        return;
+    function easeInOutQuad(t) {
+        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     }
 
-    const t = currentTime / duration;
-    const easedT = easeInOutQuad(t); // Apply easing function
-    camera.position.lerpVectors(startPosition, targetPosition, easedT);
-    requestAnimationFrame(update);
-}
+    function update() {
+        currentTime += 16; // Assuming 60fps, 1000ms/60fps ≈ 16ms
+
+        if (currentTime >= duration) {
+            camera.position.copy(targetPosition); // Ensure the camera reaches the exact target position
+            controls.enabled = false; // Disable camera controls after changing position
+            return;
+        }
+
+        const t = currentTime / duration;
+        const easedT = easeInOutQuad(t); // Apply easing function
+        camera.position.lerpVectors(startPosition, targetPosition, easedT);
+        requestAnimationFrame(update);
+    }
     update();
 }
 
@@ -230,13 +218,17 @@ document.getElementById('startButton').addEventListener('click', function() {
 
 
 
+
+
 function animate() {
     requestAnimationFrame(animate);
     controls.update(); // This will adjust the camera based on user interaction
     renderer.render(scene, camera);
+    
+    // Update audio listener's position to match the camera
+    const cameraPosition = camera.getWorldPosition(new THREE.Vector3());
+    listener.position.copy(cameraPosition);
 }
-
-
 // Function to handle window resize
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -250,53 +242,7 @@ window.addEventListener('resize', onWindowResize);
 // Set initial size
 onWindowResize();
 
-// Function to toggle play/pause for all audio sources and the video
-function togglePlayPause() {
-    if (audioSources.length === 0) {
-        console.error('No audio sources loaded.');
-        return;
-    }
 
-    // Check if any audio source is playing
-    const isAnyAudioPlaying = audioSources.some(audio => audio.isPlaying);
-
-    // Toggle playback state of all audio sources
-    audioSources.forEach(audio => {
-        if (isAnyAudioPlaying) {
-            audio.pause();
-        } else {
-            audio.play();
-        }
-    });
-
-    // Toggle playback state of the video element
-    if (videoElement.paused) {
-        videoElement.play();
-    } else {
-        videoElement.pause();
-    }
-
-    // Update the button text based on the state of the first audio source
-    const isPlaying = audioSources[0].isPlaying;
-    playPauseButton.textContent = isPlaying ? 'Pause' : 'Play';
-}
-
-
-// Function to handle media ended event
-function handleMediaEnded(mediaElement) {
-    mediaElement.addEventListener('ended', () => {
-        mediaElement.currentTime = 0; // Reset media playback to the beginning
-        mediaElement.play(); // Start playing again
-    });
-}
-
-// Add event listeners to ensure endless looping of audio sources
-audioSources.forEach(audio => {
-    handleMediaEnded(audio);
-});
-
-// Add event listener to ensure endless looping of the video
-handleMediaEnded(videoElement);
 
 
 // Function to create a sphere with audio source attached
@@ -308,22 +254,27 @@ function createAudioSphere(position, audioUrl) {
     // Set position
     sphere.position.copy(position);
 
+    // Create an object to hold the audio source
+    const audioHolder = new THREE.Object3D();
+    sphere.add(audioHolder);
+
     // Add audio source
     const audio = new THREE.PositionalAudio(listener);
     const audioLoader = new THREE.AudioLoader();
     audioLoader.load(audioUrl, (buffer) => {
         audio.setBuffer(buffer);
         audio.setRefDistance(1);
+        audioHolder.add(audio); // Attach audio to the audio holder
         audio.play(); // You may want to control when to play the audio based on user interaction
     }, undefined, (err) => {
         console.error('Failed to load audio:', err);
     });
-    sphere.add(audio);
 
     scene.add(sphere);
 
     return sphere;
 }
+
 
 // Add spheres with audio sources
 const audioSpheres = [];
@@ -345,11 +296,37 @@ function animateAudioSpheres() {
             Math.cos(frequency * time + i) * amplitude
         );
         audioSpheres[i].position.copy(audioPositions[i]).add(positionOffset);
+        audioSpheres[i].children[0].position.copy(positionOffset); // Update audio position
     }
 
     // Request next frame
     requestAnimationFrame(animateAudioSpheres);
 }
 
+
+
 // Start animation loop for audio spheres
 animateAudioSpheres();
+
+// Reset button click event listener
+document.getElementById('resetButton').addEventListener('click', function() {
+    // Reset camera position
+    setCameraPosition(1); // Reset camera position to default
+    
+    // Stop and reset audio sources
+    audioSources.forEach(audio => {
+        audio.stop(); // Stop playing audio
+        audio.isPlaying = false; // Update the 'isPlaying' state
+        if (audio.source) {
+            audio.source.stop(); // Stop the Web Audio API source node
+            audio.source.disconnect(); // Disconnect the source node
+            delete audio.source; // Remove the source node reference
+        }
+    });
+    
+    // Hide the reset button
+    this.style.display = 'none';
+    
+    // Show the start button again
+    document.getElementById('startButton').style.display = 'block';
+});
