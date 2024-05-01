@@ -4,9 +4,7 @@ const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerH
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById('myContainer').appendChild(renderer.domElement);
-let isAudioPlaying = false; // Global variable to track audio playback state
 
-// Add an audio listener to the camera
 const listener = new THREE.AudioListener();
 camera.add(listener);
 
@@ -14,7 +12,7 @@ const audioUrls = [
     'https://dl.dropboxusercontent.com/scl/fi/b10yqo42r8biq6h0jtzge/Obj_1.wav?rlkey=csonvb9b19yp2zp4lx6elpum9&st=8ee4pnvr&dl=1',
     'https://dl.dropboxusercontent.com/scl/fi/ryuw8v9r9hdqns5nkvxlg/Obj_2.wav?rlkey=e63n5f44f8q18wks1b1g3wc3e&st=is889qj9&dl=1',
     'https://dl.dropboxusercontent.com/scl/fi/87oonsmphqwjdxrtuehlg/Obj_3.wav?rlkey=wnmhjl4ex6fgnv4fth3cw93av&st=vlk6haqc&dl=1',
-    'https://dl.dropboxusercontent.com/scl/fi/1z3svxo35cibx41o7aqo4/Obj_4.wav?rlkey=gjvzblj98te5poofg0g5p1l3c&st=ks08aca6&dl=1'
+    'https://dl.dropbox.com/scl/fi/1z3svxo35cibx41o7aqo4/Obj_4.wav?rlkey=gjvzblj98te5poofg0g5p1l3c&st=ks08aca6&dl=1'
 ];
 const modelIDs = ['1', '2', '3', '4'];
 const audioSources = [];
@@ -33,29 +31,26 @@ controls.enabled = false;
 const loader = new THREE.GLTFLoader();
 let mixer;
 const clock = new THREE.Clock(); // Clock for managing animation frame updates
-loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/6631423fe7e0db20d7b8321b_court-w-animation.glb.txt', function(gltf) {
+loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/6631423fe7e0db20d7b8321b_court-w-animation.glb.txt', function (gltf) {
     const court = gltf.scene;
     scene.add(court);
 
-// Set the desired x, y, z coordinates for the orbit point
-const targetX = 0;
-const targetY = 2;
-const targetZ = 10;
+    // Set the desired x, y, z coordinates for the orbit point
+    const targetX = 0;
+    const targetY = 2;
+    const targetZ = 10;
 
-// Set the target coordinates for the OrbitControls
-controls.target.set(targetX, targetY, targetZ);
+    // Set the target coordinates for the OrbitControls
+    controls.target.set(targetX, targetY, targetZ);
 
-// Set the camera position based on your preferred values
-const cameraX = 0;
-const cameraY = 0;
-const cameraZ = 10;
+    // Set the camera position based on your preferred values
+    const cameraX = 0;
+    const cameraY = 0;
+    const cameraZ = 10;
 
-// Set the camera position
-camera.position.set(cameraX, cameraY, cameraZ);
-setCameraPosition(1); // Set initial camera position to follow button 1
-  
-  
-  
+    // Set the camera position
+    camera.position.set(cameraX, cameraY, cameraZ);
+    setCameraPosition(1); // Set initial camera position to follow button 1
 
     // Animation Mixer
     mixer = new THREE.AnimationMixer(court);
@@ -71,16 +66,14 @@ setCameraPosition(1); // Set initial camera position to follow button 1
                 const audio = new THREE.PositionalAudio(listener);
                 audio.setBuffer(buffer);
                 audio.setRefDistance(1);
-                audio.play();
                 child.add(audio);
                 audioSources.push(audio);
             });
         }
     });
-}, undefined, function(error) {
+}, undefined, function (error) {
     console.error('An error happened during the loading of the GLB:', error);
 });
-
 
 
 // Set camera field of view
@@ -156,7 +149,6 @@ function setCameraPosition(position) {
     update();
 }
 
-
 // Animation function
 function animate() {
     requestAnimationFrame(animate);
@@ -165,7 +157,6 @@ function animate() {
     controls.update();
     renderer.render(scene, camera);
 }
-
 
 // Function to handle window resize
 function onWindowResize() {
@@ -181,8 +172,9 @@ window.addEventListener('resize', onWindowResize);
 onWindowResize();
 
 // Start button click event listener
-document.getElementById('startButton').addEventListener('click', function() {
+document.getElementById('startButton').addEventListener('click', function () {
     const audioContext = THREE.AudioContext.getContext();
+    const videoElement = document.getElementById('videoElement'); // Get video element
 
     // Check if the audio context is suspended, then resume it
     if (audioContext.state === 'suspended') {
@@ -194,9 +186,6 @@ document.getElementById('startButton').addEventListener('click', function() {
                     audio.play();
                 }
             });
-
-            // Play the video
-            videoElement.play();
         }).catch(error => {
             console.error("Error resuming audio context:", error);
         });
@@ -207,14 +196,55 @@ document.getElementById('startButton').addEventListener('click', function() {
                 audio.play();
             }
         });
-        // Play the video
+    }
+
+    // Restart animations
+    if (mixer) {
+        mixer.stopAllAction(); // Stop all current actions
+        mixer.update(0); // Reset time
+
+        mixer._actions.forEach(action => {
+            action.reset(); // Reset action
+            action.play();  // Restart the action
+        });
+    }
+
+    // Play the video
+    if (videoElement) {
         videoElement.play();
     }
-  
-
 
     controls.enabled = true;
     animate(); // Start animation loop
     this.style.display = 'none'; // Hide the start button
 });
 
+// Set up a timeout for stopping animations and resetting
+function resetExperience() {
+    if (mixer) {
+        mixer.stopAllAction(); // Stop all actions
+        mixer._actions.forEach(action => {
+            action.stop();
+            action.reset(); // Reset action to initial state
+        });
+    }
+
+    // Stop all audio
+    audioSources.forEach(audio => audio.stop());
+
+    // Pause the video
+    const videoElement = document.getElementById('videoElement');
+    if (videoElement) {
+        videoElement.pause();
+        videoElement.currentTime = 0; // Reset to the start
+    }
+
+    // Disable camera controls
+    controls.enabled = false;
+
+    // Show the start button again
+    document.getElementById('startButton').style.display = 'block';
+}
+
+const totalDuration = 28; // Or set this dynamically based on your animation duration
+setInterval(resetExperience, totalDuration * 1000);
