@@ -31,7 +31,7 @@ controls.enabled = false;
 const loader = new THREE.GLTFLoader();
 let mixer;
 const clock = new THREE.Clock(); // Clock for managing animation frame updates
-loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/6631423fe7e0db20d7b8321b_court-w-animation.glb.txt', function (gltf) {
+loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/66326e3f7f1ec3bbab6e5e54_court-w-ball.glb.txt', function (gltf) {
     const court = gltf.scene;
     scene.add(court);
 
