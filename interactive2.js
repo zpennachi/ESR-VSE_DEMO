@@ -171,56 +171,8 @@ window.addEventListener('resize', onWindowResize);
 // Initial resize call
 onWindowResize();
 
-// Start button click event listener
-document.getElementById('startButton').addEventListener('click', function () {
-    const audioContext = THREE.AudioContext.getContext();
-    const videoElement = document.getElementById('videoElement'); // Get video element
-
-    // Check if the audio context is suspended, then resume it
-    if (audioContext.state === 'suspended') {
-        audioContext.resume().then(() => {
-            console.log("Audio Context resumed successfully!");
-            // Play all audio sources after resuming the context
-            audioSources.forEach(audio => {
-                if (!audio.isPlaying) {
-                    audio.play();
-                }
-            });
-        }).catch(error => {
-            console.error("Error resuming audio context:", error);
-        });
-    } else {
-        // If not suspended, just play everything
-        audioSources.forEach(audio => {
-            if (!audio.isPlaying) {
-                audio.play();
-            }
-        });
-    }
-
-    // Restart animations
-    if (mixer) {
-        mixer.stopAllAction(); // Stop all current actions
-        mixer.update(0); // Reset time
-
-        mixer._actions.forEach(action => {
-            action.reset(); // Reset action
-            action.play();  // Restart the action
-        });
-    }
-
-    // Play the video
-    if (videoElement) {
-        videoElement.play();
-    }
-
-    controls.enabled = true;
-    animate(); // Start animation loop
-    this.style.display = 'none'; // Hide the start button
-});
-
-// Set up a timeout for stopping animations and resetting
-function resetExperience() {
+// Function to stop and reset the experience
+function stopExperience() {
     if (mixer) {
         mixer.stopAllAction(); // Stop all actions
         mixer._actions.forEach(action => {
@@ -246,5 +198,68 @@ function resetExperience() {
     document.getElementById('startButton').style.display = 'block';
 }
 
-const totalDuration = 28; // Or set this dynamically based on your animation duration
-setInterval(resetExperience, totalDuration * 1000);
+let experienceTimer;
+const totalDuration = 26; // Or set this dynamically based on your animation duration
+
+function startExperience() {
+    // Reset the timer
+    clearTimeout(experienceTimer);
+    experienceTimer = setTimeout(stopExperience, totalDuration * 1000);
+
+    // Restart animations
+    if (mixer) {
+        mixer.stopAllAction(); // Stop all current actions
+        mixer.update(0); // Reset time
+
+        mixer._actions.forEach(action => {
+            action.reset(); // Reset action
+            action.play();  // Restart the action
+        });
+    }
+
+    // Play the video
+    const videoElement = document.getElementById('videoElement');
+    if (videoElement) {
+        videoElement.play();
+    }
+
+    controls.enabled = true;
+    animate(); // Start animation loop
+}
+
+// Start button click event listener
+document.getElementById('startButton').addEventListener('click', function () {
+    const audioContext = THREE.AudioContext.getContext();
+
+    // Check if the audio context is suspended, then resume it
+    if (audioContext.state === 'suspended') {
+        audioContext.resume().then(() => {
+            console.log("Audio Context resumed successfully!");
+            // Play all audio sources after resuming the context
+            audioSources.forEach(audio => {
+                if (!audio.isPlaying) {
+                    audio.play();
+                }
+            });
+        }).catch(error => {
+            console.error("Error resuming audio context:", error);
+        });
+    } else {
+        // If not suspended, just play everything
+        audioSources.forEach(audio => {
+            if (!audio.isPlaying) {
+                audio.play();
+            }
+        });
+    }
+
+    startExperience();
+    this.style.display = 'none'; // Hide the start button
+});
+
+// Handle visibility change
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        stopExperience();
+    }
+});
