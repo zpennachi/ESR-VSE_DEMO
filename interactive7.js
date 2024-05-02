@@ -20,6 +20,7 @@ const audioLoader = new THREE.AudioLoader();
 
 // Create OrbitControls
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enablePan = false; // Disable camera panning
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
 controls.screenSpacePanning = false;
