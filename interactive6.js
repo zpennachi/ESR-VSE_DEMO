@@ -9,10 +9,10 @@ const listener = new THREE.AudioListener();
 camera.add(listener);
 
 const audioUrls = [
-    'https://dl.dropboxusercontent.com/scl/fi/b10yqo42r8biq6h0jtzge/Obj_1.wav?rlkey=csonvb9b19yp2zp4lx6elpum9&st=8ee4pnvr&dl=1',
-    'https://dl.dropboxusercontent.com/scl/fi/ryuw8v9r9hdqns5nkvxlg/Obj_2.wav?rlkey=e63n5f44f8q18wks1b1g3wc3e&st=is889qj9&dl=1',
-    'https://dl.dropboxusercontent.com/scl/fi/87oonsmphqwjdxrtuehlg/Obj_3.wav?rlkey=wnmhjl4ex6fgnv4fth3cw93av&st=vlk6haqc&dl=1',
-    'https://dl.dropbox.com/scl/fi/1z3svxo35cibx41o7aqo4/Obj_4.wav?rlkey=gjvzblj98te5poofg0g5p1l3c&st=ks08aca6&dl=1'
+    'https://dl.dropboxusercontent.com/scl/fi/38d9sc88rja1dm2sb03j7/Object1_Stem_Clean.wav?rlkey=jjc2b54indilyii0v13wdfo0l&st=y3vz9yob&dl=1',
+    'https://dl.dropboxusercontent.com/https://www.dropbox.com/scl/fi/c56iswd54qbrwxtcjfl3b/Object2_Stem_Clean.wav?rlkey=wxon0m65jqo9lo00c0z2efd38&st=3uyvo06f&dl=1',
+    'https://dl.dropboxusercontent.com/scl/fi/3pcbb3qumatmwdmbnuc0x/Object3_Stem_Clean.wav?rlkey=70alm1f1ur7lvpfzmtf96ye6h&st=iba7jnd7&dl=0',
+    'https://dl.dropbox.com/scl/fi/we6tie6erbfp7i4osmz97/Object4_Stem_Clean.wav?rlkey=j1og3cp62o1k6lpjpmw5einoi&st=ko9ksadj&dl=1'
 ];
 const modelIDs = ['1', '2', '3', '4'];
 const audioSources = [];
@@ -25,13 +25,13 @@ controls.dampingFactor = 0.05;
 controls.screenSpacePanning = false;
 controls.maxPolarAngle = Math.PI / 2;
 // Disable camera controls initially
-controls.enabled = false;
+controls.enabled = true;
 
 // Load the GLTF model with animations
 const loader = new THREE.GLTFLoader();
 let mixer;
 const clock = new THREE.Clock(); // Clock for managing animation frame updates
-loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/66326e3f7f1ec3bbab6e5e54_court-w-ball.glb.txt', function (gltf) {
+loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/6631423fe7e0db20d7b8321b_court-w-animation.glb.txt', function (gltf) {
     const court = gltf.scene;
     scene.add(court);
 
@@ -109,10 +109,14 @@ scene.add(pointLight4);
 document.getElementById('btn1').addEventListener('click', () => setCameraPosition(1));
 document.getElementById('btn2').addEventListener('click', () => setCameraPosition(2));
 document.getElementById('btn3').addEventListener('click', () => setCameraPosition(3));
+document.getElementById('btn4').addEventListener('click', () => setCameraPosition(4));
+
+let orbitControlsEnabled = true; // Flag to track if orbit controls are enabled
 
 function setCameraPosition(position) {
     const startPosition = camera.position.clone();
-    let targetPosition;
+    let targetPosition, lookAtTarget;
+
     switch (position) {
         case 1:
             targetPosition = new THREE.Vector3(0, 0, 2);
@@ -123,6 +127,10 @@ function setCameraPosition(position) {
         case 3:
             targetPosition = new THREE.Vector3(8, 0, 2);
             break;
+        case 4:
+            targetPosition = new THREE.Vector3(0, -6, 12); // Approximate position under the basket
+            lookAtTarget = new THREE.Vector3(0, 0, 0); // Look towards center court
+            break;
     }
 
     const duration = 2000; // Transition duration in milliseconds
@@ -132,12 +140,17 @@ function setCameraPosition(position) {
         return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     }
 
-    function update() {
+       function update() {
         currentTime += 16; // Assuming 60fps, 1000ms/60fps ≈ 16ms
 
         if (currentTime >= duration) {
             camera.position.copy(targetPosition); // Ensure the camera reaches the exact target position
-            controls.enabled = false; // Disable camera controls after changing position
+            if (position === 4) {
+                camera.lookAt(lookAtTarget); // Adjust camera to look towards the center court
+            }
+            if (orbitControlsEnabled) {
+                controls.enabled = true; // Re-enable orbit controls after changing position
+            }
             return;
         }
 
@@ -192,7 +205,7 @@ function stopExperience() {
     }
 
     // Disable camera controls
-    controls.enabled = false;
+    controls.enabled = true;
 
     // Show the start button again
     document.getElementById('startButton').style.display = 'block';
@@ -224,7 +237,7 @@ function startExperience() {
         videoElement.play();
     }
 
-    controls.enabled = false;
+    controls.enabled = true;
     animate(); // Start animation loop
 }
 
