@@ -66,12 +66,12 @@ document.getElementById('leftArrow').addEventListener('click', () => {
     if (isBehindBasket) {
         if (currentCameraState < CAMERA_STATE_RIGHT) { // If not already rightmost
             currentCameraState++;
-            updateCameraTargetSmoothly(currentCameraState * 2, 500); // Move right
+            updateCameraTargetSmoothly(currentCameraState * 6, 1000); // Move right
         }
     } else {
         if (currentCameraState > CAMERA_STATE_LEFT) { // If not already leftmost
             currentCameraState--;
-            updateCameraTargetSmoothly(currentCameraState * 2, 500); // Move left
+            updateCameraTargetSmoothly(currentCameraState * 6, 1000); // Move left
         }
     }
 });
@@ -81,16 +81,15 @@ document.getElementById('rightArrow').addEventListener('click', () => {
     if (isBehindBasket) {
         if (currentCameraState > CAMERA_STATE_LEFT) { // If not already leftmost
             currentCameraState--;
-            updateCameraTargetSmoothly(currentCameraState * 2, 500); // Move left
+            updateCameraTargetSmoothly(currentCameraState * 6, 1000); // Move left
         }
     } else {
         if (currentCameraState < CAMERA_STATE_RIGHT) { // If not already rightmost
             currentCameraState++;
-            updateCameraTargetSmoothly(currentCameraState * 2, 500); // Move right
+            updateCameraTargetSmoothly(currentCameraState * 6, 1000); // Move right
         }
     }
 });
-
 
 // Load the GLTF model with animations
 const loader = new THREE.GLTFLoader();
@@ -179,7 +178,6 @@ document.getElementById('btn4').addEventListener('click', () => setCameraPositio
 let orbitControlsEnabled = false; // Flag to track if orbit controls are enabled
 
 
-
 function setCameraPosition(position) {
     const startPosition = camera.position.clone();
     let targetPosition, lookAtTarget;
@@ -187,19 +185,21 @@ function setCameraPosition(position) {
     switch (position) {
         case 1:
             targetPosition = new THREE.Vector3(0, 0, 2);
-                    controls.target.set(0, 2, 10); // Adjust the values according to your scene
-        currentCameraState = CAMERA_STATE_CENTER;
+            isBehindBasket = false;
+            controls.target.set(0, 2, 10); // Adjust the values according to your scene
+            currentCameraState = CAMERA_STATE_CENTER;
             break;
-    
         case 2:
             targetPosition = new THREE.Vector3(-8, 0, 2);
-                    controls.target.set(0, 2, 10); // Adjust the values according to your scene
-        currentCameraState = CAMERA_STATE_CENTER;
+            isBehindBasket = false;
+            controls.target.set(0, 2, 10); // Adjust the values according to your scene
+            currentCameraState = CAMERA_STATE_CENTER;
             break;
         case 3:
             targetPosition = new THREE.Vector3(8, 0, 2);
-                    controls.target.set(0, 2, 10); // Adjust the values according to your scene
-        currentCameraState = CAMERA_STATE_CENTER;
+            isBehindBasket = false;
+            controls.target.set(0, 2, 10); // Adjust the values according to your scene
+            currentCameraState = CAMERA_STATE_CENTER;
             break;
         case 4:
             targetPosition = new THREE.Vector3(0, -6, 12); // Behind basket position
@@ -207,11 +207,11 @@ function setCameraPosition(position) {
             isBehindBasket = true; // Set the flag to true
             // Reset orbit controls target to the center
             controls.target.set(0, 2, 10); // Adjust the values according to your scene
+            // Reset the arrow functionality by setting the current state to center
+            currentCameraState = CAMERA_STATE_CENTER;
             break;
-
-        default:
-            isBehindBasket = false; // Reset the flag for other positions
     }
+
 
     const duration = 2000; // Transition duration in milliseconds
     let currentTime = 0;
