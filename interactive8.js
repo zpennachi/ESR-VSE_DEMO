@@ -26,7 +26,71 @@ controls.dampingFactor = 0.05;
 controls.screenSpacePanning = false;
 controls.maxPolarAngle = Math.PI / 2;
 // Disable camera controls initially
-controls.enabled = true;
+controls.enabled = false;
+
+
+
+// Constants for the camera states
+const CAMERA_STATE_CENTER = 0;
+const CAMERA_STATE_LEFT = -1;
+const CAMERA_STATE_RIGHT = 1;
+
+// Track the current state
+let currentCameraState = CAMERA_STATE_CENTER;
+
+// Function to update the camera target smoothly based on the state
+function updateCameraTargetSmoothly(targetX, duration) {
+    const start = Date.now();
+    const initialTargetX = controls.target.x;
+    
+    function update() {
+        const elapsed = Date.now() - start;
+        const progress = Math.min(elapsed / duration, 1); // Ensure progress is between 0 and 1
+        
+        controls.target.x = initialTargetX + (targetX - initialTargetX) * progress; // Interpolate target
+        
+        controls.update(); // Update controls
+        
+        if (progress < 1) {
+            requestAnimationFrame(update); // Continue updating until duration is reached
+        }
+    }
+    
+    update(); // Start the update loop
+}
+
+let isBehindBasket = false; // Flag to track if the camera is behind the basket
+
+// Event listener for the left arrow button
+document.getElementById('leftArrow').addEventListener('click', () => {
+    if (isBehindBasket) {
+        if (currentCameraState < CAMERA_STATE_RIGHT) { // If not already rightmost
+            currentCameraState++;
+            updateCameraTargetSmoothly(currentCameraState * 2, 500); // Move right
+        }
+    } else {
+        if (currentCameraState > CAMERA_STATE_LEFT) { // If not already leftmost
+            currentCameraState--;
+            updateCameraTargetSmoothly(currentCameraState * 2, 500); // Move left
+        }
+    }
+});
+
+// Event listener for the right arrow button
+document.getElementById('rightArrow').addEventListener('click', () => {
+    if (isBehindBasket) {
+        if (currentCameraState > CAMERA_STATE_LEFT) { // If not already leftmost
+            currentCameraState--;
+            updateCameraTargetSmoothly(currentCameraState * 2, 500); // Move left
+        }
+    } else {
+        if (currentCameraState < CAMERA_STATE_RIGHT) { // If not already rightmost
+            currentCameraState++;
+            updateCameraTargetSmoothly(currentCameraState * 2, 500); // Move right
+        }
+    }
+});
+
 
 // Load the GLTF model with animations
 const loader = new THREE.GLTFLoader();
@@ -112,7 +176,9 @@ document.getElementById('btn2').addEventListener('click', () => setCameraPositio
 document.getElementById('btn3').addEventListener('click', () => setCameraPosition(3));
 document.getElementById('btn4').addEventListener('click', () => setCameraPosition(4));
 
-let orbitControlsEnabled = true; // Flag to track if orbit controls are enabled
+let orbitControlsEnabled = false; // Flag to track if orbit controls are enabled
+
+
 
 function setCameraPosition(position) {
     const startPosition = camera.position.clone();
@@ -121,17 +187,30 @@ function setCameraPosition(position) {
     switch (position) {
         case 1:
             targetPosition = new THREE.Vector3(0, 0, 2);
+                    controls.target.set(0, 2, 10); // Adjust the values according to your scene
+        currentCameraState = CAMERA_STATE_CENTER;
             break;
+    
         case 2:
             targetPosition = new THREE.Vector3(-8, 0, 2);
+                    controls.target.set(0, 2, 10); // Adjust the values according to your scene
+        currentCameraState = CAMERA_STATE_CENTER;
             break;
         case 3:
             targetPosition = new THREE.Vector3(8, 0, 2);
+                    controls.target.set(0, 2, 10); // Adjust the values according to your scene
+        currentCameraState = CAMERA_STATE_CENTER;
             break;
         case 4:
-            targetPosition = new THREE.Vector3(0, -6, 12); // Approximate position under the basket
+            targetPosition = new THREE.Vector3(0, -6, 12); // Behind basket position
             lookAtTarget = new THREE.Vector3(0, 0, 0); // Look towards center court
+            isBehindBasket = true; // Set the flag to true
+            // Reset orbit controls target to the center
+            controls.target.set(0, 2, 10); // Adjust the values according to your scene
             break;
+
+        default:
+            isBehindBasket = false; // Reset the flag for other positions
     }
 
     const duration = 2000; // Transition duration in milliseconds
@@ -150,7 +229,7 @@ function setCameraPosition(position) {
                 camera.lookAt(lookAtTarget); // Adjust camera to look towards the center court
             }
             if (orbitControlsEnabled) {
-                controls.enabled = true; // Re-enable orbit controls after changing position
+                controls.enabled = false; // Re-enable orbit controls after changing position
             }
             return;
         }
@@ -206,7 +285,7 @@ function stopExperience() {
     }
 
     // Disable camera controls
-    controls.enabled = true;
+    controls.enabled = false;
 
     // Show the start button again
     document.getElementById('startButton').style.display = 'block';
@@ -238,7 +317,7 @@ function startExperience() {
         videoElement.play();
     }
 
-    controls.enabled = true;
+    controls.enabled = false;
     animate(); // Start animation loop
 }
 
