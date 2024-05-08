@@ -59,11 +59,6 @@ loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/6631423fe7
     console.error('An error happened during the loading of the GLB:', error);
 });
 
-
-
-
-
-
 // Camera positions and rotations
 const cameraPositions = [
     { position: new THREE.Vector3(0, 1, 3), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(-180), 0) },
@@ -71,10 +66,6 @@ const cameraPositions = [
     { position: new THREE.Vector3(8, 1, 4), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(102.857), 0) },
     { position: new THREE.Vector3(0, 1, 12), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(-0), 0) }
 ];
-
-
-
-
 
 // Add lights to the scene
 const ambientLight = new THREE.AmbientLight(0xffffff, 1);
@@ -100,8 +91,6 @@ const pointLight4 = new THREE.PointLight(0x0000FF, 0.4, 30); // Blue
 pointLight4.position.set(10, 10, 0); // Right side of the center
 scene.add(pointLight4);
 
-
-
 // Animation function
 function animate() {
     requestAnimationFrame(animate);
@@ -110,14 +99,10 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-
-
 // Easing function: easeInOutQuad
 function easeInOutQuad(t) {
     return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 }
-
-
 
 const buttons = document.createElement('div');
 cameraPositions.forEach((pos, index) => {
@@ -190,17 +175,6 @@ function normalizeRotation() {
     camera.rotation.y = (camera.rotation.y + Math.PI * 4) % (Math.PI * 2);
 }
 
-
-
-
-
-
-
-
-
-
-
-
 // Function to handle window resize
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -234,9 +208,10 @@ function stopExperience() {
         videoElement.currentTime = 0; // Reset to the start
     }
 
-
-    // Show the start button again
-    document.getElementById('startButton').style.display = 'block';
+    // Show the start buttons again
+    document.querySelectorAll('.startButton').forEach(button => {
+        button.style.display = 'block';
+    });
 }
 
 let experienceTimer;
@@ -255,7 +230,6 @@ function startExperience() {
         mixer._actions.forEach(action => {
             action.reset(); // Reset action
             action.play();  // Restart the action
-          
         });
     }
 
@@ -267,8 +241,17 @@ function startExperience() {
     animate(); // Start animation loop
 }
 
-// Start button click event listener
-document.getElementById('startButton').addEventListener('click', function () {
+// Start button click event listeners
+document.getElementById('startButton1').addEventListener('click', startButtonFunctionality);
+document.getElementById('startButton2').addEventListener('click', startButtonFunctionality);
+
+// Functionality for start buttons
+function startButtonFunctionality() {
+    // Hide all elements with the class name 'startButton' after any start button is clicked
+    document.querySelectorAll('.startButton').forEach(button => {
+        button.style.display = 'none';
+    });
+
     const audioContext = THREE.AudioContext.getContext();
 
     // Check if the audio context is suspended, then resume it
@@ -294,8 +277,7 @@ document.getElementById('startButton').addEventListener('click', function () {
     }
 
     startExperience();
-    this.style.display = 'none'; // Hide the start button
-});
+}
 
 // Handle visibility change
 document.addEventListener('visibilitychange', () => {
@@ -303,3 +285,4 @@ document.addEventListener('visibilitychange', () => {
         stopExperience();
     }
 });
+
