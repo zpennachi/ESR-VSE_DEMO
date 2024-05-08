@@ -267,42 +267,35 @@ function startExperience() {
     animate(); // Start animation loop
 }
 
-
-
 // Start button click event listener
-document.querySelectorAll('.startButton').forEach(button => {
-    button.addEventListener('click', function () {
-        const audioContext = THREE.AudioContext.getContext();
+document.getElementById('startButton').addEventListener('click', function () {
+    const audioContext = THREE.AudioContext.getContext();
 
-        // Check if the audio context is suspended, then resume it
-        if (audioContext.state === 'suspended') {
-            audioContext.resume().then(() => {
-                console.log("Audio Context resumed successfully!");
-                // Play all audio sources after resuming the context
-                audioSources.forEach(audio => {
-                    if (!audio.isPlaying) {
-                        audio.play();
-                    }
-                });
-            }).catch(error => {
-                console.error("Error resuming audio context:", error);
-            });
-        } else {
-            // If not suspended, just play everything
+    // Check if the audio context is suspended, then resume it
+    if (audioContext.state === 'suspended') {
+        audioContext.resume().then(() => {
+            console.log("Audio Context resumed successfully!");
+            // Play all audio sources after resuming the context
             audioSources.forEach(audio => {
                 if (!audio.isPlaying) {
                     audio.play();
                 }
             });
-        }
+        }).catch(error => {
+            console.error("Error resuming audio context:", error);
+        });
+    } else {
+        // If not suspended, just play everything
+        audioSources.forEach(audio => {
+            if (!audio.isPlaying) {
+                audio.play();
+            }
+        });
+    }
 
-        startExperience();
-        this.style.display = 'none'; // Hide the start button
-    });
+    startExperience();
+    this.style.display = 'none'; // Hide the start button
 });
-
-
-
 
 // Handle visibility change
 document.addEventListener('visibilitychange', () => {
@@ -310,4 +303,3 @@ document.addEventListener('visibilitychange', () => {
         stopExperience();
     }
 });
-
