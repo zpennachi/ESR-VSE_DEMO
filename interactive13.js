@@ -110,6 +110,29 @@ function animate() {
     renderer.render(scene, camera);
 }
 
+
+
+// Easing function: easeInOutQuad
+function easeInOutQuad(t) {
+    return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+}
+
+
+
+const buttons = document.createElement('div');
+cameraPositions.forEach((pos, index) => {
+    const button = document.createElement('button');
+    button.textContent = `Camera ${index + 1}`;
+    button.classList.add('interactive-btn'); // Add the class "interactive-btn"
+    button.onclick = () => {
+        const targetPosition = pos.position;
+        const targetRotation = pos.rotation;
+        transitionCameraPosition(targetPosition, targetRotation, 2000, easeInOutQuad); // Adjust duration and easing function as needed
+    };
+    buttons.appendChild(button);
+});
+document.getElementById('cameraControls').appendChild(buttons);
+
 // Function to smoothly transition between camera positions
 function transitionCameraPosition(targetPosition, targetRotation, duration, easingFunction) {
     const startPosition = camera.position.clone();
@@ -120,7 +143,7 @@ function transitionCameraPosition(targetPosition, targetRotation, duration, easi
 
     // Default easing function if not provided
     easingFunction = easingFunction || function(t) { return t; };
-  
+
     function update() {
         const now = Date.now();
         const elapsed = now - startTime;
@@ -138,68 +161,34 @@ function transitionCameraPosition(targetPosition, targetRotation, duration, easi
     update();
 }
 
-// Easing function: easeInOutQuad
-function easeInOutQuad(t) {
-    return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-}
-
-
-
-// HTML controls for smooth camera transitions
-const buttons = document.createElement('div');
-buttons.className = 'interactive-demo-button'; // Add class to the container div
-cameraPositions.forEach((pos, index) => {
-    const button = document.createElement('button');
-    button.className = 'interactive-demo-button'; // Add class to each button
-    button.textContent = `Camera ${index + 1}`;
-    button.onclick = () => {
-        const targetPosition = pos.position;
-        const targetRotation = pos.rotation;
-        transitionCameraPosition(targetPosition, targetRotation, 2000, easeInOutQuad); // Adjust duration and easing function as needed
-    };
-    buttons.appendChild(button);
-});
-document.getElementById('cameraControls').appendChild(buttons); // Updated here
-
-
-
-
-
-
-
-
-
-// Function to rotate the camera left
-function rotateCameraLeft() {
+// Function to rotate the camera left with smooth transition
+function rotateCameraLeftSmooth() {
     console.log("Rotate left clicked");
-    const rotationSpeed = 0.05; // Adjust rotation speed as needed
-    camera.rotateY(rotationSpeed); // Rotate the camera
-    console.log("Current rotation:", camera.rotation.y);
-    normalizeRotation();
+    const rotationIncrement = THREE.MathUtils.degToRad(20); // Increase rotation increment as needed
+    const rotationAxis = new THREE.Vector3(0, 1, 0).applyQuaternion(camera.quaternion); // Calculate rotation axis based on camera orientation
+    camera.rotateOnAxis(rotationAxis, rotationIncrement); // Rotate the camera
+    normalizeRotation(); // Ensure rotation stays within [0, 2π)
 }
 
-// Function to rotate the camera right
-function rotateCameraRight() {
+// Function to rotate the camera right with smooth transition
+function rotateCameraRightSmooth() {
     console.log("Rotate right clicked");
-    const rotationSpeed = 0.05; // Adjust rotation speed as needed
-    camera.rotateY(-rotationSpeed); // Rotate the camera in the opposite direction
-    console.log("Current rotation:", camera.rotation.y);
-    normalizeRotation();
+    const rotationIncrement = THREE.MathUtils.degToRad(20); // Increase rotation increment as needed
+    const rotationAxis = new THREE.Vector3(0, 1, 0).applyQuaternion(camera.quaternion); // Calculate rotation axis based on camera orientation
+    camera.rotateOnAxis(rotationAxis, -rotationIncrement); // Rotate the camera in the opposite direction
+    normalizeRotation(); // Ensure rotation stays within [0, 2π)
 }
+
+// Event listener for left arrow button with smooth transition
+document.getElementById('leftArrow').addEventListener('click', rotateCameraLeftSmooth);
+
+// Event listener for right arrow button with smooth transition
+document.getElementById('rightArrow').addEventListener('click', rotateCameraRightSmooth);
+
 // Function to normalize rotation to ensure it remains within [0, 2 * Math.PI)
 function normalizeRotation() {
-    if (camera.rotation.y < 0) {
-        camera.rotation.y += 2 * Math.PI;
-    } else if (camera.rotation.y >= 2 * Math.PI) {
-        camera.rotation.y -= 2 * Math.PI;
-    }
+    camera.rotation.y = (camera.rotation.y + Math.PI * 4) % (Math.PI * 2);
 }
-
-// Event listener for left arrow button
-document.getElementById('leftArrow').addEventListener('click', rotateCameraLeft);
-
-// Event listener for right arrow button
-document.getElementById('rightArrow').addEventListener('click', rotateCameraRight);
 
 
 
