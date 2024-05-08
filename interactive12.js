@@ -147,8 +147,10 @@ function easeInOutQuad(t) {
 
 // HTML controls for smooth camera transitions
 const buttons = document.createElement('div');
+buttons.className = 'interactive-demo-button'; // Add class to the container div
 cameraPositions.forEach((pos, index) => {
     const button = document.createElement('button');
+    button.className = 'interactive-demo-button'; // Add class to each button
     button.textContent = `Camera ${index + 1}`;
     button.onclick = () => {
         const targetPosition = pos.position;
@@ -158,7 +160,6 @@ cameraPositions.forEach((pos, index) => {
     buttons.appendChild(button);
 });
 document.getElementById('cameraControls').appendChild(buttons); // Updated here
-
 
 
 
