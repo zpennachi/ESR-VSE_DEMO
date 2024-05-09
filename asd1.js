@@ -113,19 +113,26 @@ function easeInOutQuad(t) {
     return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 }
 
-const buttons = document.createElement('div');
+const cameraControls = document.getElementById('cameraControls'); // Get the parent element
+
+const buttonLabels = ['Left', 'Center', 'Courtside', 'Basket']; // Button labels
+
+// Add click event listeners to position buttons
 cameraPositions.forEach((pos, index) => {
     const button = document.createElement('button');
-    button.textContent = `Camera ${index + 1}`;
+    button.textContent = buttonLabels[index]; // Set button label
     button.classList.add('interactive-btn'); // Add the class "interactive-btn"
     button.onclick = () => {
         const targetPosition = pos.position;
         const targetRotation = pos.rotation;
         transitionCameraPosition(targetPosition, targetRotation, 2000, easeInOutQuad); // Adjust duration and easing function as needed
+        // Reset click counts
+        leftClickCount = 0;
+        rightClickCount = 0;
     };
-    buttons.appendChild(button);
+    cameraControls.appendChild(button); // Append button directly to cameraControls element
 });
-document.getElementById('cameraControls').appendChild(buttons);
+
 
 // Function to smoothly transition between camera positions
 function transitionCameraPosition(targetPosition, targetRotation, duration, easingFunction) {
@@ -155,22 +162,33 @@ function transitionCameraPosition(targetPosition, targetRotation, duration, easi
     update();
 }
 
+let leftClickCount = 0;
+let rightClickCount = 0;
+
 // Function to rotate the camera left with smooth transition
 function rotateCameraLeftSmooth() {
-    console.log("Rotate left clicked");
-    const rotationIncrement = THREE.MathUtils.degToRad(20); // Increase rotation increment as needed
-    const rotationAxis = new THREE.Vector3(0, 1, 0).applyQuaternion(camera.quaternion); // Calculate rotation axis based on camera orientation
-    camera.rotateOnAxis(rotationAxis, rotationIncrement); // Rotate the camera
-    normalizeRotation(); // Ensure rotation stays within [0, 2π)
+    if (leftClickCount < 2) {
+        console.log("Rotate left clicked");
+        const rotationIncrement = THREE.MathUtils.degToRad(20); // Increase rotation increment as needed
+        const rotationAxis = new THREE.Vector3(0, 1, 0).applyQuaternion(camera.quaternion); // Calculate rotation axis based on camera orientation
+        camera.rotateOnAxis(rotationAxis, rotationIncrement); // Rotate the camera
+        normalizeRotation(); // Ensure rotation stays within [0, 2π)
+        leftClickCount++;
+        rightClickCount = Math.max(-2, rightClickCount - 1); // Decrement right click count, but limit it to -2
+    }
 }
 
 // Function to rotate the camera right with smooth transition
 function rotateCameraRightSmooth() {
-    console.log("Rotate right clicked");
-    const rotationIncrement = THREE.MathUtils.degToRad(20); // Increase rotation increment as needed
-    const rotationAxis = new THREE.Vector3(0, 1, 0).applyQuaternion(camera.quaternion); // Calculate rotation axis based on camera orientation
-    camera.rotateOnAxis(rotationAxis, -rotationIncrement); // Rotate the camera in the opposite direction
-    normalizeRotation(); // Ensure rotation stays within [0, 2π)
+    if (rightClickCount < 2) {
+        console.log("Rotate right clicked");
+        const rotationIncrement = THREE.MathUtils.degToRad(20); // Increase rotation increment as needed
+        const rotationAxis = new THREE.Vector3(0, 1, 0).applyQuaternion(camera.quaternion); // Calculate rotation axis based on camera orientation
+        camera.rotateOnAxis(rotationAxis, -rotationIncrement); // Rotate the camera in the opposite direction
+        normalizeRotation(); // Ensure rotation stays within [0, 2π)
+        rightClickCount++;
+        leftClickCount = Math.min(2, leftClickCount - 1); // Decrement left click count, but limit it to 2
+    }
 }
 
 // Event listener for left arrow button with smooth transition
