@@ -19,16 +19,16 @@ camera.updateProjectionMatrix(); // Update projection matrix if needed
 // Attach audio listener to the camera
 camera.add(listener);
 
-const audioUrls = [ 'https://dl.dropboxusercontent.com/scl/fi/yq7wytj7b3t8zyl1ozavq/Ball_Stem.wav?rlkey=6ja4u4jsqslegu6kg4k3zqin4&st=xv1a0ky7&dl=1',
-                   'https://dl.dropboxusercontent.com/scl/fi/3jsjonhvkldl9jdw3u9tg/Player1_Stem.wav?rlkey=6e13u8agsyfj92igdol3jye4b&st=spgqwml1&dl=1',
-    'https://dl.dropboxusercontent.com/scl/fi/4n1z85h3whox381vwwmov/Player2_Stem.wav?rlkey=jqfjy1de01ofs5vo8kr6tytpy&st=l1q5ha76&dl=1',
-    'https://dl.dropboxusercontent.com/scl/fi/udkjlvml5dipxracl4bfp/Player3_Stem.wav?rlkey=lqqohxoknrizmb88jx9i8810b&st=phqo3dqe&dl=1',
-    'https://dl.dropbox.com/scl/fi/fke6pwb4tkuzs0n5aktjt/Player4_Stem.wav?rlkey=2xgl8akade8zb3j5xnhyw0tig&st=b5euek8h&dl=1'
+const audioUrls = [ 'https://dl.dropboxusercontent.com/scl/fi/gejrhc8rschd61mvim08t/Ball_Stem.mp3?rlkey=2vtrd1x9yt70hek3izfdfbbng&st=274qcqos&dl=1',
+                   'https://dl.dropboxusercontent.com/scl/fi/1h0odt7c86s7um981hipc/Player1_Stem.mp3?rlkey=7jn4qtq2jhku8x6y37bt3zt9h&st=dztcrefe&dl=1',
+    'https://dl.dropboxusercontent.com/scl/fi/m1x3j4ftkpioajtnjowav/Player2_Stem.mp3?rlkey=hh8dpl2j4tavh7b2s61k3qqtu&st=6vd8r078&dl=1',
+    'https://dl.dropboxusercontent.com/scl/fi/9enp2k4tu2zeu9wpwdtmq/Player3_Stem.mp3?rlkey=a4g969nje5w80r7z9n7njinvz&st=gic30yva&dl=1',
+    'https://dl.dropbox.com/scl/fi/o5rqt85jhpfsqbh2nao4x/Player4_Stem.mp3?rlkey=hhzjfomsvpes1d8x8rug4u8f7&st=j4by1phw&dl=1'
  ,
-                    'https://dl.dropbox.com/scl/fi/8fekebnhmittn3ph2raqi/Player5_Stem.wav?rlkey=458v605d54xhi88zkm76nn3t2&st=4s696zyz&dl=1'
+                    'https://dl.dropbox.com/scl/fi/3lc96uo4wb7rkr43z7jh3/Player5_Stem.mp3?rlkey=evfya458rs8814pxs1fw6dlpo&st=1lqls9ff&dl=1'
  ,
                    
-                    'https://dl.dropbox.com/scl/fi/z2ndvf23rdy7obrf00q8k/Player6_Stem.wav?rlkey=64thhoezqmt0h1t1m7g0zgmis&st=ddmntknn&dl=1'
+                    'https://dl.dropbox.com/scl/fi/krhe4dib2fs5dsjfbi6i7/Player6_Stem.mp3?rlkey=w417hko2ujetlk4j8c9mhd9hb&st=czmcki0h&dl=1'
  ,
                    
 ];
