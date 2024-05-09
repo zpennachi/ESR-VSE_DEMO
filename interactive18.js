@@ -61,9 +61,10 @@ loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/6631423fe7
 
 // Camera positions and rotations
 const cameraPositions = [
-    { position: new THREE.Vector3(0, 1, 3), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(-180), 0) },
-    { position: new THREE.Vector3(-8, 1, 8), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(-90), 0) },
+
+       { position: new THREE.Vector3(0, 1, 3), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(-180), 0) },
     { position: new THREE.Vector3(8, 1, 4), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(102.857), 0) },
+      { position: new THREE.Vector3(-8, 1, 8), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(-90), 0) },
     { position: new THREE.Vector3(0, 1, 12), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(-0), 0) }
 ];
 
