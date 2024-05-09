@@ -8,9 +8,9 @@ const listener = new THREE.AudioListener();
 
 const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-// Set initial camera position and rotation
-const initialCameraPosition = new THREE.Vector3(-4, .5, 4); // Example initial position
-const initialCameraRotation = new THREE.Euler(0, THREE.MathUtils.degToRad(-90), 0); // Example initial rotation
+// Set initial camera position and rotation to match the "center" position
+const initialCameraPosition = new THREE.Vector3(0, 2, 6); // Center position
+const initialCameraRotation = new THREE.Euler(0, THREE.MathUtils.degToRad(0), 0); // Center rotation
 
 camera.position.copy(initialCameraPosition);
 camera.rotation.copy(initialCameraRotation);
