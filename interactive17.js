@@ -105,9 +105,10 @@ function easeInOutQuad(t) {
 }
 
 const buttons = document.createElement('div');
+const buttonLabels = ['Left', 'Center', 'Courtside', 'Basket']; // Updated button labels
 cameraPositions.forEach((pos, index) => {
     const button = document.createElement('button');
-    button.textContent = `Camera ${index + 1}`;
+    button.textContent = buttonLabels[index]; // Set button label
     button.classList.add('interactive-btn'); // Add the class "interactive-btn"
     button.onclick = () => {
         const targetPosition = pos.position;
@@ -117,6 +118,7 @@ cameraPositions.forEach((pos, index) => {
     buttons.appendChild(button);
 });
 document.getElementById('cameraControls').appendChild(buttons);
+
 
 // Function to smoothly transition between camera positions
 function transitionCameraPosition(targetPosition, targetRotation, duration, easingFunction) {
