@@ -70,10 +70,10 @@ loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/663cf8e85a
 
 // Camera positions and rotations
 const cameraPositions = [
-    { position: new THREE.Vector3(4, .5, 2), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(0), 0) },
-       { position: new THREE.Vector3(0, .5, 1.5), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(90), 0) },
-      { position: new THREE.Vector3(-4, .5, 4), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(-45), 0) },
-    { position: new THREE.Vector3(0, 1, 2), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(45), 0) }
+    { position: new THREE.Vector3(5, 1, 0), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(90), 0) },
+       { position: new THREE.Vector3(0, 2, 6), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(0), 0) },
+      { position: new THREE.Vector3(-4, .5, 3), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(-45), 0) },
+    { position: new THREE.Vector3(-1, 1, 0), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(90), 0) }
 ];
 
 // Add lights to the scene
@@ -115,7 +115,7 @@ function easeInOutQuad(t) {
 
 const cameraControls = document.getElementById('cameraControls'); // Get the parent element
 
-const buttonLabels = ['Left', 'Center', 'Courtside', 'Basket']; // Button labels
+const buttonLabels = ['Under Basket', 'Center', 'Courtside', 'Three Point']; // Button labels
 
 // Add click event listeners to position buttons
 cameraPositions.forEach((pos, index) => {
