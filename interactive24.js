@@ -18,10 +18,10 @@ camera.updateProjectionMatrix(); // Update projection matrix if needed
 
 // Attach audio listener to the camera
 camera.add(listener);
-const audioUrls = [ 'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/raw/main/Obj_1%20(1).mp3',
-    'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/raw/main/Obj_2%20(1).mp3',
-    'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/raw/main/Obj_3%20(1).mp3',
-    'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/raw/main/Obj_4%20(1).mp3'
+const audioUrls = ['https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Obj_2%20(1).mp3',
+    'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Obj_1%20(1).mp3',
+    'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Obj_3%20(1).mp3',
+    'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Obj_4%20(1).mp3'
 ];
 const modelIDs = ['1', '2', '3', '4'];
 const audioSources = [];
