@@ -19,19 +19,19 @@ camera.updateProjectionMatrix(); // Update projection matrix if needed
 // Attach audio listener to the camera
 camera.add(listener);
 
-const audioUrls = [ 'https://dl.dropboxusercontent.com/scl/fi/gejrhc8rschd61mvim08t/Ball_Stem.mp3?rlkey=2vtrd1x9yt70hek3izfdfbbng&st=274qcqos&dl=1',
-                   'https://dl.dropboxusercontent.com/scl/fi/1h0odt7c86s7um981hipc/Player1_Stem.mp3?rlkey=7jn4qtq2jhku8x6y37bt3zt9h&st=dztcrefe&dl=1',
-    'https://dl.dropboxusercontent.com/scl/fi/m1x3j4ftkpioajtnjowav/Player2_Stem.mp3?rlkey=hh8dpl2j4tavh7b2s61k3qqtu&st=6vd8r078&dl=1',
-    'https://dl.dropboxusercontent.com/scl/fi/9enp2k4tu2zeu9wpwdtmq/Player3_Stem.mp3?rlkey=a4g969nje5w80r7z9n7njinvz&st=gic30yva&dl=1',
-    'https://dl.dropbox.com/scl/fi/o5rqt85jhpfsqbh2nao4x/Player4_Stem.mp3?rlkey=hhzjfomsvpes1d8x8rug4u8f7&st=j4by1phw&dl=1'
- ,
-                    'https://dl.dropbox.com/scl/fi/3lc96uo4wb7rkr43z7jh3/Player5_Stem.mp3?rlkey=evfya458rs8814pxs1fw6dlpo&st=1lqls9ff&dl=1'
- ,
-                   
-                    'https://dl.dropbox.com/scl/fi/krhe4dib2fs5dsjfbi6i7/Player6_Stem.mp3?rlkey=w417hko2ujetlk4j8c9mhd9hb&st=czmcki0h&dl=1'
- ,
-                   
+
+
+
+
+const audioUrls = ['https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Ball_Stem.mp3',
+    'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Player1_Stem.mp3',
+    'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Player2_Stem.mp3',
+    'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Player3_Stem.mp3',
+    'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Player4_Stem.mp3',
+    'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Player5_Stem.mp3',
+    'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Player6_Stem.mp3',
 ];
+
 const modelIDs = ['1', '2', '3', '4', '5', '6', '7',];
 const audioSources = [];
 const audioLoader = new THREE.AudioLoader();
@@ -41,7 +41,7 @@ const audioLoader = new THREE.AudioLoader();
 const loader = new THREE.GLTFLoader();
 let mixer;
 const clock = new THREE.Clock(); // Clock for managing animation frame updates
-loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/663d46695cc94d79ce10ceb0_court-update-right-players.glb.txt', function (gltf) {
+loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/663d46695cc94d79ce10ceb0_court-update-right-players.glb.txt', function(gltf) {
     const court = gltf.scene;
     scene.add(court);
 
@@ -64,15 +64,31 @@ loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/663d46695c
             });
         }
     });
-}, undefined, function (error) {
+}, undefined, function(error) {
     console.error('An error happened during the loading of the GLB:', error);
+});
+
+// Load non-spatialized audio track
+const nonSpatialAudioUrl = 'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/AllStar_Game_FOH.mp3'; 
+const nonSpatialAudio = new THREE.PositionalAudio(listener);
+const nonSpatialAudioLoader = new THREE.AudioLoader();
+
+nonSpatialAudioLoader.load(nonSpatialAudioUrl, (buffer) => {
+    nonSpatialAudio.setBuffer(buffer);
+    nonSpatialAudio.setRefDistance(1); // Adjust as needed
+
+    // Lower the volume here (0.5 is half volume, adjust as needed)
+    nonSpatialAudio.setVolume(0.5);
+
+    listener.add(nonSpatialAudio); // Add audio to the listener
+    audioSources.push(nonSpatialAudio); // Add to list of audio sources for management
 });
 
 // Camera positions and rotations
 const cameraPositions = [
     { position: new THREE.Vector3(5, 1, 0), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(90), 0) },
-       { position: new THREE.Vector3(0, 2, 6), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(0), 0) },
-      { position: new THREE.Vector3(-4, .5, 3), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(-45), 0) },
+    { position: new THREE.Vector3(0, 2, 6), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(0), 0) },
+    { position: new THREE.Vector3(-4, .5, 3), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(-45), 0) },
     { position: new THREE.Vector3(-1, 1, 0), rotation: new THREE.Euler(0, THREE.MathUtils.degToRad(90), 0) }
 ];
 
@@ -256,7 +272,7 @@ function startExperience() {
 
         mixer._actions.forEach(action => {
             action.reset(); // Reset action
-            action.play();  // Restart the action
+            action.play(); // Restart the action
         });
     }
 
@@ -312,4 +328,3 @@ document.addEventListener('visibilitychange', () => {
         stopExperience();
     }
 });
-
