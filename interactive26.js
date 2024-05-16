@@ -96,7 +96,7 @@ let net2Audio;
 const loader = new THREE.GLTFLoader();
 let mixer;
 const clock = new THREE.Clock(); // Clock for managing animation frame updates
-loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/66462cf580fe660530359d84_nets-fix.glb.txt', function(gltf) {
+loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/66464fdbb596dafdc5a82406_rtvse-asd.glb.txt', function(gltf) {
     const court = gltf.scene;
     scene.add(court);
 
