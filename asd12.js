@@ -92,7 +92,7 @@ const audioLoader = new THREE.AudioLoader();
 const loader = new THREE.GLTFLoader();
 let mixer;
 const clock = new THREE.Clock(); // Clock for managing animation frame updates
-loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/66461c65e38fffcd99f6e9c8_nba-w-nets.glb.txt', function(gltf) {
+loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/66464fdbb596dafdc5a82406_rtvse-asd.glb.txt', function(gltf) {
     const court = gltf.scene;
     scene.add(court);
 
