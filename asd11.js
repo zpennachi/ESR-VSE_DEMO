@@ -7,8 +7,6 @@ let allAudioLoaded = false;
 let audioLoadedCount = 0;
 let court;
 
-
-
 //VIDEO STUFF
 const video = document.createElement('video');
 video.crossOrigin = "anonymous";
@@ -80,11 +78,13 @@ const audioUrls = [
     'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Player3_Stem.mp3',
     'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Player4_Stem.mp3',
     'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Player5_Stem.mp3',
-    'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Player6_Stem.mp3'
-
+    'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Player6_Stem.mp3',
+    'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/NetL_Stem.mp3',
+    'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/NetR_Stem.mp3' // Add the URL for basket1
 ];
 
-const modelIDs = ['1', '2', '3', '4', '5', '6', '7'];
+const modelIDs = ['1', '2', '3', '4', '5', '6', '7', 'basket1', 'basket2']; 
+
 const audioSources = [];
 const audioLoader = new THREE.AudioLoader();
 
@@ -92,18 +92,10 @@ const audioLoader = new THREE.AudioLoader();
 const loader = new THREE.GLTFLoader();
 let mixer;
 const clock = new THREE.Clock(); // Clock for managing animation frame updates
-loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/663d46695cc94d79ce10ceb0_court-update-right-players.glb.txt', function(gltf) {
+loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/66461c65e38fffcd99f6e9c8_nba-w-nets.glb.txt', function(gltf) {
     const court = gltf.scene;
     scene.add(court);
 
-  
-  
-  
-  
-  
-  
-  
-  
   
       // Add event listener to the scale button
     document.getElementById('ARButton').addEventListener('click', function() {
@@ -287,6 +279,53 @@ cameraPositions.forEach((pos, index) => {
     };
     cameraControls.appendChild(button); // Append button directly to cameraControls element
 });
+
+
+function onSessionStarted(session) {
+    // Start the AR session
+    session.requestReferenceSpace('local').then(function(referenceSpace) {
+        renderer.xr.setReferenceSpaceType('local');
+        renderer.xr.setReferenceSpace(referenceSpace);
+        session.requestAnimationFrame(onAnimationFrame);
+    });
+}
+
+function onAnimationFrame(time, frame) {
+    const referenceSpace = frame.session.refSpace;
+    const viewerPose = frame.getViewerPose(referenceSpace);
+
+    if (viewerPose) {
+        const viewerPosition = viewerPose.transform.position;
+        const viewerRotation = viewerPose.transform.orientation;
+
+        // Offset the spawn point in front of the user and down at their waist
+        const offset = new THREE.Vector3(0, -2, -2); // 2 feet down, 2 feet in front
+        offset.applyQuaternion(viewerRotation);
+        const spawnPoint = viewerPosition.clone().add(offset);
+
+        // Set the position of the model
+        court.position.copy(spawnPoint);
+    }
+
+    renderer.render(scene, camera);
+    frame.session.requestAnimationFrame(onAnimationFrame);
+}
+
+// Start AR session
+renderer.xr.addEventListener('sessionstart', onSessionStarted);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // Function to smoothly transition between camera positions
