@@ -27,7 +27,7 @@ const videoScreen = new THREE.Mesh(geometry, material);
 // Set position and rotation of the video screen relative to the camera
 videoScreen.position.set(0, 2, -5); // Adjust position as needed
 videoScreen.rotation.y = Math.PI; // Adjust rotation if needed
-
+videoScreen.scale.set(-1, 1, 1);
 
 // Set up scene, camera, renderer
 const scene = new THREE.Scene();
@@ -69,7 +69,7 @@ function preloadVideo(url) {
     req.send();
 }
 
-preloadVideo('https://cdn.jsdelivr.net/gh/zpennachi/ESR-VSE_DEMO@main/NBA_AllStar_Demo_Clip%20(2).mp4');
+preloadVideo('https://dl.dropboxusercontent.com/scl/fi/1jhocy9rmets44vx4q2ys/NBA_AllStar_Demo_Clip-3.mp4?rlkey=th4wc4jro4rou9y6uek131jc6&st=x4q9ys3r&dl=1');
 
 const audioUrls = [
     'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Ball_Stem.mp3',
