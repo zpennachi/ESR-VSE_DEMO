@@ -1,41 +1,92 @@
+
+import { ARButton } from 'https://unpkg.com/three@0.140.0/examples/jsm/webxr/ARButton.js';
+
+let isGLBLoaded = false;
+let isVideoLoaded = false;
+let allAudioLoaded = false;
+let audioLoadedCount = 0;
+let court;
+
+
+
+//VIDEO STUFF
+const video = document.createElement('video');
+video.crossOrigin = "anonymous";
+video.preload = 'auto';  
+video.load(); 
+video.muted = true;
+
+// Create a texture from the video element
+const videoTexture = new THREE.VideoTexture(video);
+videoTexture.minFilter = THREE.LinearFilter;
+videoTexture.magFilter = THREE.LinearFilter;
+videoTexture.format = THREE.RGBAFormat;
+
+// Create a plane geometry that will use the video texture
+const geometry = new THREE.PlaneGeometry(4, 2.25); // 16:9 aspect ratio, adjust size as needed
+const material = new THREE.MeshBasicMaterial({ map: videoTexture, side: THREE.DoubleSide });
+const videoScreen = new THREE.Mesh(geometry, material);
+// Set position and rotation of the video screen relative to the camera
+videoScreen.position.set(0, 2, -5); // Adjust position as needed
+videoScreen.rotation.y = Math.PI; // Adjust rotation if needed
+
+
 // Set up scene, camera, renderer
 const scene = new THREE.Scene();
-
-const renderer = new THREE.WebGLRenderer();
+scene.add(videoScreen);
+const renderer = new THREE.WebGLRenderer({ alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 const listener = new THREE.AudioListener();
-
 const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
-
+renderer.xr.setReferenceSpaceType('local-floor'); // or 'local-floor' based on your needs
+renderer.xr.enabled = true;
+document.body.appendChild(ARButton.createButton(renderer, { requiredFeatures: ['hit-test'] }));
+scene.background = null;
 // Set initial camera position and rotation to match the "center" position
 const initialCameraPosition = new THREE.Vector3(0, 2, 6); // Center position
 const initialCameraRotation = new THREE.Euler(0, THREE.MathUtils.degToRad(0), 0); // Center rotation
-
 camera.position.copy(initialCameraPosition);
 camera.rotation.copy(initialCameraRotation);
 camera.updateProjectionMatrix(); // Update projection matrix if needed
+camera.add(listener); // Attach audio listener to the camera
 
-// Attach audio listener to the camera
-camera.add(listener);
+function preloadVideo(url) {
+    const req = new XMLHttpRequest();
+    req.open('GET', url, true);
+    req.responseType = 'blob';
 
+    req.onload = function() {
+        if (this.status === 200) {
+            var videoBlob = this.response;
+            var vid = URL.createObjectURL(videoBlob); // IE10+
+            video.src = vid;
+            console.log('Video preloaded!');
+        }
+    };
+    req.onerror = function() {
+        console.log('Error on preloading video.');
+    };
 
+    req.send();
+}
 
+preloadVideo('https://cdn.jsdelivr.net/gh/zpennachi/ESR-VSE_DEMO@main/NBA_AllStar_Demo_Clip%20(2).mp4');
 
-
-const audioUrls = ['https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Ball_Stem.mp3',
+const audioUrls = [
+    'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Ball_Stem.mp3',
     'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Player1_Stem.mp3',
     'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Player2_Stem.mp3',
     'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Player3_Stem.mp3',
     'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Player4_Stem.mp3',
     'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Player5_Stem.mp3',
-    'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Player6_Stem.mp3',
+    'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Player6_Stem.mp3'
+
 ];
 
-const modelIDs = ['1', '2', '3', '4', '5', '6', '7',];
+const modelIDs = ['1', '2', '3', '4', '5', '6', '7'];
 const audioSources = [];
 const audioLoader = new THREE.AudioLoader();
-
 
 // Load the GLTF model with animations
 const loader = new THREE.GLTFLoader();
@@ -45,40 +96,74 @@ loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/663d46695c
     const court = gltf.scene;
     scene.add(court);
 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      // Add event listener to the scale button
+    document.getElementById('ARButton').addEventListener('click', function() {
+        // Check if the court object is defined
+        if (court) {
+            // Check the current scale of the court
+            const currentScale = court.scale.x;
+            // Define the target scale for scaling up/down the court
+            const targetScale = currentScale === 1.0 ? 0.1 : 1.0; // Toggle between 1.0 and 0.5
+            // Set the new scale for the court
+            court.scale.set(targetScale, targetScale, targetScale);
+        }
+    });
+
+  
     // Animation Mixer
     mixer = new THREE.AnimationMixer(court);
     gltf.animations.forEach((clip) => {
         mixer.clipAction(clip).play();
     });
+court.traverse((child) => {
+    const index = modelIDs.indexOf(child.name);
+    if (index !== -1) {
+        audioLoader.load(audioUrls[index], (buffer) => {
+            const audio = new THREE.PositionalAudio(listener);
+            audio.setBuffer(buffer);
+            audio.setRefDistance(1);
+            audio.setDistanceModel('exponential');
+            audio.setRolloffFactor(2.5);
+            child.add(audio);
+            audioSources.push(audio);
 
-    // Attach audio to specific models
-    court.traverse((child) => {
-        const index = modelIDs.indexOf(child.name);
-        if (index !== -1) {
-            audioLoader.load(audioUrls[index], (buffer) => {
-                const audio = new THREE.PositionalAudio(listener);
-                audio.setBuffer(buffer);
-                audio.setRefDistance(1);
-                child.add(audio);
-                audioSources.push(audio);
+                // Increment the loaded count and check if all audio is loaded
+                audioLoadedCount++;
+                if (audioLoadedCount === audioUrls.length) {
+                    allAudioLoaded = true;
+                    checkAllLoaded();
+                }
+            }, undefined, function(error) {
+                console.error(`Error loading audio for model ${child.name}:`, error);
             });
         }
-    });
+    }); 
+      // Once the model is loaded, set the flag and check all resources
+    isGLBLoaded = true;
+    checkAllLoaded();
 }, undefined, function(error) {
     console.error('An error happened during the loading of the GLB:', error);
 });
 
 // Load non-spatialized audio track
 const nonSpatialAudioUrl = 'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/AllStar_Game_FOH.mp3'; 
-const nonSpatialAudio = new THREE.PositionalAudio(listener);
+const nonSpatialAudio = new THREE.Audio(listener);
 const nonSpatialAudioLoader = new THREE.AudioLoader();
 
 nonSpatialAudioLoader.load(nonSpatialAudioUrl, (buffer) => {
-    nonSpatialAudio.setBuffer(buffer);
-    nonSpatialAudio.setRefDistance(1); // Adjust as needed
+
 
     // Lower the volume here (0.5 is half volume, adjust as needed)
-    nonSpatialAudio.setVolume(0.5);
+    nonSpatialAudio.setVolume(1);
 
     listener.add(nonSpatialAudio); // Add audio to the listener
     audioSources.push(nonSpatialAudio); // Add to list of audio sources for management
@@ -116,13 +201,67 @@ const pointLight4 = new THREE.PointLight(0x0000FF, 0.4, 30); // Blue
 pointLight4.position.set(10, 10, 0); // Right side of the center
 scene.add(pointLight4);
 
-// Animation function
-function animate() {
-    requestAnimationFrame(animate);
-    const delta = clock.getDelta();
-    if (mixer) mixer.update(delta);
-    renderer.render(scene, camera);
+
+function checkAllLoaded() {
+    console.log(`GLB Loaded: ${isGLBLoaded}, Video Loaded: ${isVideoLoaded}, All Audio Loaded: ${allAudioLoaded}`);
+    if (isGLBLoaded && isVideoLoaded && allAudioLoaded) {
+        // Target the first start button
+        var startButton1 = document.getElementById('startButton1');
+        if (startButton1) {
+            startButton1.disabled = false; // Enable the start button only if it exists
+            console.log("Start Button 1 enabled.");
+        } else {
+            console.log("Start Button 1 not found!");
+        }
+
+        // Target the second start button
+        var startButton2 = document.getElementById('startButton2');
+        if (startButton2) {
+            startButton2.disabled = false; // Enable the start button only if it exists
+            console.log("Start Button 2 enabled.");
+        } else {
+            console.log("Start Button 2 not found!");
+        }
+
+        console.log("All assets loaded. Ready to start!");
+    }
 }
+
+
+video.addEventListener('canplaythrough', () => {
+    isVideoLoaded = true;
+    checkAllLoaded();
+});
+if (video.readyState >= 4) {  // HAVE_ENOUGH_DATA
+    isVideoLoaded = true;
+    checkAllLoaded();
+}
+
+
+function animate() {
+    renderer.setAnimationLoop(() => {
+      
+
+
+
+        // Calculate the time delta
+        const delta = clock.getDelta();
+        
+        // Update the animation mixer if it's been initialized
+        if (mixer) {
+            mixer.update(delta);
+        }
+        
+        // Ensure the video texture updates if the video has enough data
+        if (video && video.readyState >= video.HAVE_CURRENT_DATA) {
+            videoTexture.needsUpdate = true;
+        }
+
+        // Render the scene with the camera
+        renderer.render(scene, camera);
+    });
+}
+
 
 // Easing function: easeInOutQuad
 function easeInOutQuad(t) {
@@ -225,31 +364,23 @@ function onWindowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-// Event listener for window resize
-window.addEventListener('resize', onWindowResize);
 
-// Initial resize call
-onWindowResize();
 
-// Function to stop and reset the experience
 function stopExperience() {
     if (mixer) {
-        mixer.stopAllAction(); // Stop all actions
+        mixer.stopAllAction(); // Stop all animations
         mixer._actions.forEach(action => {
             action.stop();
-            action.reset(); // Reset action to initial state
+            action.reset(); // Reset actions to their initial state
         });
     }
 
     // Stop all audio
     audioSources.forEach(audio => audio.stop());
 
-    // Pause the video
-    const videoElement = document.getElementById('videoElement');
-    if (videoElement) {
-        videoElement.pause();
-        videoElement.currentTime = 0; // Reset to the start
-    }
+    // Pause and reset the video
+    video.pause();
+    video.currentTime = 0;
 
     // Show the start buttons again
     document.querySelectorAll('.startButton').forEach(button => {
@@ -288,10 +419,7 @@ function startExperience() {
 document.getElementById('startButton1').addEventListener('click', startButtonFunctionality);
 document.getElementById('startButton2').addEventListener('click', startButtonFunctionality);
 
-// Functionality for start buttons
-function startButtonFunctionality() {
-    // Hide all elements with the class name 'startButton' after any start button is clicked
-    document.querySelectorAll('.startButton').forEach(button => {
+function startButtonFunctionality() { document.querySelectorAll('.startButton').forEach(button => {
         button.style.display = 'none';
     });
 
@@ -307,6 +435,8 @@ function startButtonFunctionality() {
                     audio.play();
                 }
             });
+            // Play the video
+            video.play();
         }).catch(error => {
             console.error("Error resuming audio context:", error);
         });
@@ -317,14 +447,16 @@ function startButtonFunctionality() {
                 audio.play();
             }
         });
+        // Play the video
+        video.play();
     }
 
     startExperience();
 }
 
-// Handle visibility change
-document.addEventListener('visibilitychange', () => {
+
+document.addEventListener('visibilitychange', function() {
     if (document.hidden) {
-        stopExperience();
+        stopExperience(); // Stop the experience when the tab is not in focus
     }
 });
