@@ -1,4 +1,3 @@
-
 import { ARButton } from 'https://unpkg.com/three@0.140.0/examples/jsm/webxr/ARButton.js';
 
 let isGLBLoaded = false;
@@ -7,11 +6,11 @@ let allAudioLoaded = false;
 let audioLoadedCount = 0;
 let court;
 
-//VIDEO STUFF
+// VIDEO STUFF
 const video = document.createElement('video');
 video.crossOrigin = "anonymous";
-video.preload = 'auto';  
-video.load(); 
+video.preload = 'auto';
+video.load();
 video.muted = true;
 
 // Create a texture from the video element
@@ -54,7 +53,7 @@ function preloadVideo(url) {
     req.open('GET', url, true);
     req.responseType = 'blob';
 
-    req.onload = function() {
+    req.onload = function () {
         if (this.status === 200) {
             var videoBlob = this.response;
             var vid = URL.createObjectURL(videoBlob); // IE10+
@@ -62,14 +61,12 @@ function preloadVideo(url) {
             console.log('Video preloaded!');
         }
     };
-    req.onerror = function() {
+    req.onerror = function () {
         console.log('Error on preloading video.');
     };
 
     req.send();
 }
-
-
 
 preloadVideo('https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/NBA_AllStar_Demo_Clip%20(2).mp4');
 
@@ -85,7 +82,7 @@ const audioUrls = [
     'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/NetR_Stem.mp3' // Add the URL for basket1
 ];
 
-const modelIDs = ['1', '2', '3', '4', '5', '6', '7', 'basket1', 'basket2']; 
+const modelIDs = ['1', '2', '3', '4', '5', '6', '7', 'basket1', 'basket2'];
 
 const audioSources = [];
 const audioLoader = new THREE.AudioLoader();
@@ -94,41 +91,27 @@ const audioLoader = new THREE.AudioLoader();
 const loader = new THREE.GLTFLoader();
 let mixer;
 const clock = new THREE.Clock(); // Clock for managing animation frame updates
-loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/66464fdbb596dafdc5a82406_rtvse-asd.glb.txt', function(gltf) {
-    const court = gltf.scene;
+loader.load('https://uploads-ssl.webflow.com/62585c8f3b855d70abac2fff/66464fdbb596dafdc5a82406_rtvse-asd.glb.txt', function (gltf) {
+    court = gltf.scene;
+    court.scale.set(0.1, 0.1, 0.1); // Set the scale to 0.1 for AR
     scene.add(court);
 
-  
-      // Add event listener to the scale button
-    document.getElementById('ARButton').addEventListener('click', function() {
-        // Check if the court object is defined
-        if (court) {
-            // Check the current scale of the court
-            const currentScale = court.scale.x;
-            // Define the target scale for scaling up/down the court
-            const targetScale = currentScale === 1.0 ? 0.1 : 1.0; // Toggle between 1.0 and 0.5
-            // Set the new scale for the court
-            court.scale.set(targetScale, targetScale, targetScale);
-        }
-    });
-
-  
     // Animation Mixer
     mixer = new THREE.AnimationMixer(court);
     gltf.animations.forEach((clip) => {
         mixer.clipAction(clip).play();
     });
-court.traverse((child) => {
-    const index = modelIDs.indexOf(child.name);
-    if (index !== -1) {
-        audioLoader.load(audioUrls[index], (buffer) => {
-            const audio = new THREE.PositionalAudio(listener);
-            audio.setBuffer(buffer);
-            audio.setRefDistance(1);
-            audio.setDistanceModel('exponential');
-            audio.setRolloffFactor(2.5);
-            child.add(audio);
-            audioSources.push(audio);
+    court.traverse((child) => {
+        const index = modelIDs.indexOf(child.name);
+        if (index !== -1) {
+            audioLoader.load(audioUrls[index], (buffer) => {
+                const audio = new THREE.PositionalAudio(listener);
+                audio.setBuffer(buffer);
+                audio.setRefDistance(1);
+                audio.setDistanceModel('exponential');
+                audio.setRolloffFactor(2.5);
+                child.add(audio);
+                audioSources.push(audio);
 
                 // Increment the loaded count and check if all audio is loaded
                 audioLoadedCount++;
@@ -136,26 +119,24 @@ court.traverse((child) => {
                     allAudioLoaded = true;
                     checkAllLoaded();
                 }
-            }, undefined, function(error) {
+            }, undefined, function (error) {
                 console.error(`Error loading audio for model ${child.name}:`, error);
             });
         }
-    }); 
-      // Once the model is loaded, set the flag and check all resources
+    });
+    // Once the model is loaded, set the flag and check all resources
     isGLBLoaded = true;
     checkAllLoaded();
-}, undefined, function(error) {
+}, undefined, function (error) {
     console.error('An error happened during the loading of the GLB:', error);
 });
 
 // Load non-spatialized audio track
-const nonSpatialAudioUrl = 'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/AllStar_Game_FOH.mp3'; 
+const nonSpatialAudioUrl = 'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/AllStar_Game_FOH.mp3';
 const nonSpatialAudio = new THREE.Audio(listener);
 const nonSpatialAudioLoader = new THREE.AudioLoader();
 
 nonSpatialAudioLoader.load(nonSpatialAudioUrl, (buffer) => {
-
-
     // Lower the volume here (0.5 is half volume, adjust as needed)
     nonSpatialAudio.setVolume(1);
 
@@ -195,7 +176,6 @@ const pointLight4 = new THREE.PointLight(0x0000FF, 0.4, 30); // Blue
 pointLight4.position.set(10, 10, 0); // Right side of the center
 scene.add(pointLight4);
 
-
 function checkAllLoaded() {
     console.log(`GLB Loaded: ${isGLBLoaded}, Video Loaded: ${isVideoLoaded}, All Audio Loaded: ${allAudioLoaded}`);
     if (isGLBLoaded && isVideoLoaded && allAudioLoaded) {
@@ -221,7 +201,6 @@ function checkAllLoaded() {
     }
 }
 
-
 video.addEventListener('canplaythrough', () => {
     isVideoLoaded = true;
     checkAllLoaded();
@@ -231,21 +210,16 @@ if (video.readyState >= 4) {  // HAVE_ENOUGH_DATA
     checkAllLoaded();
 }
 
-
 function animate() {
     renderer.setAnimationLoop(() => {
-      
-
-
-
         // Calculate the time delta
         const delta = clock.getDelta();
-        
+
         // Update the animation mixer if it's been initialized
         if (mixer) {
             mixer.update(delta);
         }
-        
+
         // Ensure the video texture updates if the video has enough data
         if (video && video.readyState >= video.HAVE_CURRENT_DATA) {
             videoTexture.needsUpdate = true;
@@ -255,7 +229,6 @@ function animate() {
         renderer.render(scene, camera);
     });
 }
-
 
 // Easing function: easeInOutQuad
 function easeInOutQuad(t) {
@@ -282,10 +255,9 @@ cameraPositions.forEach((pos, index) => {
     cameraControls.appendChild(button); // Append button directly to cameraControls element
 });
 
-
 function onSessionStarted(session) {
     // Start the AR session
-    session.requestReferenceSpace('local').then(function(referenceSpace) {
+    session.requestReferenceSpace('local').then(function (referenceSpace) {
         renderer.xr.setReferenceSpaceType('local');
         renderer.xr.setReferenceSpace(referenceSpace);
         session.requestAnimationFrame(onAnimationFrame);
@@ -316,20 +288,6 @@ function onAnimationFrame(time, frame) {
 // Start AR session
 renderer.xr.addEventListener('sessionstart', onSessionStarted);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Function to smoothly transition between camera positions
 function transitionCameraPosition(targetPosition, targetRotation, duration, easingFunction) {
     const startPosition = camera.position.clone();
@@ -339,7 +297,7 @@ function transitionCameraPosition(targetPosition, targetRotation, duration, easi
     const startTime = Date.now();
 
     // Default easing function if not provided
-    easingFunction = easingFunction || function(t) { return t; };
+    easingFunction = easingFunction || function (t) { return t; };
 
     function update() {
         const now = Date.now();
@@ -405,8 +363,6 @@ function onWindowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-
-
 function stopExperience() {
     if (mixer) {
         mixer.stopAllAction(); // Stop all animations
@@ -460,7 +416,8 @@ function startExperience() {
 document.getElementById('startButton1').addEventListener('click', startButtonFunctionality);
 document.getElementById('startButton2').addEventListener('click', startButtonFunctionality);
 
-function startButtonFunctionality() { document.querySelectorAll('.startButton').forEach(button => {
+function startButtonFunctionality() {
+    document.querySelectorAll('.startButton').forEach(button => {
         button.style.display = 'none';
     });
 
@@ -495,8 +452,7 @@ function startButtonFunctionality() { document.querySelectorAll('.startButton').
     startExperience();
 }
 
-
-document.addEventListener('visibilitychange', function() {
+document.addEventListener('visibilitychange', function () {
     if (document.hidden) {
         stopExperience(); // Stop the experience when the tab is not in focus
     }
