@@ -1,4 +1,4 @@
-import { ARButton } from 'https://unpkg.com/three@0.128.0/examples/jsm/webxr/ARButton.js';
+import { ARButton } from 'https://cdn.jsdelivr.net/npm/three@0.140.0/examples/jsm/webxr/ARButton.js';
 
 let isGLBLoaded = false;
 let isVideoLoaded = false;
