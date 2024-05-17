@@ -69,7 +69,9 @@ function preloadVideo(url) {
     req.send();
 }
 
-preloadVideo('https://dl.dropboxusercontent.com/scl/fi/1jhocy9rmets44vx4q2ys/NBA_AllStar_Demo_Clip-3.mp4?rlkey=th4wc4jro4rou9y6uek131jc6&st=x4q9ys3r&dl=1');
+
+
+preloadVideo('https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/NBA_AllStar_Demo_Clip%20(2).mp4');
 
 const audioUrls = [
     'https://raw.githubusercontent.com/zpennachi/ESR-VSE_DEMO/main/Ball_Stem.mp3',
